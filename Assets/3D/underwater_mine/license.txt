@@ -1,0 +1,11 @@
+Model Information:
+* title:	Underwater Mine
+* source:	https://sketchfab.com/3d-models/underwater-mine-26309b5c2c8044ed8e520f09781c14e9
+* author:	iedalton (https://sketchfab.com/iedalton)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Underwater Mine" (https://sketchfab.com/3d-models/underwater-mine-26309b5c2c8044ed8e520f09781c14e9) by iedalton (https://sketchfab.com/iedalton) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

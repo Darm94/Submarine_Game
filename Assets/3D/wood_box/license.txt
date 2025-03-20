@@ -1,0 +1,11 @@
+Model Information:
+* title:	wood box
+* source:	https://sketchfab.com/3d-models/wood-box-08e19d67db214739856f3f97e486ee79
+* author:	farizbinaziz (https://sketchfab.com/farizbinaziz)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "wood box" (https://sketchfab.com/3d-models/wood-box-08e19d67db214739856f3f97e486ee79) by farizbinaziz (https://sketchfab.com/farizbinaziz) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
