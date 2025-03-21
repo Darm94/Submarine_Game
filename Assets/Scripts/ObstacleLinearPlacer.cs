@@ -29,7 +29,23 @@ public class ObstacleLinearPlacer : MonoBehaviour
                 new Vector3(0, Random.Range(0, randomVerticalDisplacement), 0),
                 prefab.transform.rotation,
                 transform);
-    
+
+           
+            if (obstacle.name == "Mine" || obstacle.name == "Mine(Clone)")
+            {
+                
+                Debug.Log(obstacle.name);
+                Debug.Log(obstacle.transform.position.y);
+                Debug.Log(_startPosition.y + randomVerticalDisplacement);
+                Debug.Log("--------- ^^^^^^^ --------");
+                if (obstacle.transform.position.y >= _startPosition.y + 1)
+                {
+                    obstacle.transform.rotation *= Quaternion.Euler(180, 0, 0);
+                    Debug.Log("--------- ROTATED ^^^ --------");
+                }
+                
+            }
+            
             _currentPosition = new Vector3(obstacle.transform.position.x, _startPosition.y, obstacle.transform.position.z);
     
             Destroy(obstacle, destroyDelay);
