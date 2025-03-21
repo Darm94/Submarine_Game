@@ -2,15 +2,12 @@ using UnityEngine;
 
 public class TranslateAnimator : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
+    [SerializeField] private float speed;
+    [SerializeField] private Vector3 direction = Vector3.right;
+    
+    //Update is called once per frame
     void Update()
     {
-        
+        transform.Translate(direction *( speed * Time.deltaTime));
     }
 }

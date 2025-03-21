@@ -2,15 +2,25 @@ using UnityEngine;
 
 public class DestroyOnBulletTrigger : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    [SerializeField] private GameObject target;
+    [SerializeField] private GameObject spawnOnDestroy;
+    [SerializeField] [Range(1,10)] private int maxInstances = 5;
+    [SerializeField] private Vector3 randomDelta = Vector3.zero;
 
-    // Update is called once per frame
-    void Update()
+    private void OnTriggerEnter(Collider other)
     {
-        
+        if (spawnOnDestroy)
+        {
+            int realInstances = Random.Range(1, maxInstances);
+
+            for (int i = 0; i < realInstances; i++)
+            {
+                GameObject go = Instantiate(spawnOnDestroy, transform.position + 
+                                                            randomDelta * Random.Range(-1f, 1f), spawnOnDestroy.transform.rotation);
+                go.transform.localScale = Vector3.one * Random.Range(0.5f, 1.5f);
+            }
+        }
+
+        Destroy(target);
     }
 }

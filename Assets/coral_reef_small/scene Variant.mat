@@ -57,6 +57,7 @@ Material:
     m_Floats:
     - _BUILTIN_QueueControl: 1
     - _CastShadows: 0
+    - _QueueControl: 1
     - metallicFactor: 0.34
     - roughnessFactor: 0.807
     m_Colors:
