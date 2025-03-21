@@ -95,6 +95,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 352833713611054251}
+  - component: {fileID: 1231185949527348461}
   m_Layer: 0
   m_Name: round pillar 2 low
   m_TagString: Untagged
@@ -118,3 +119,26 @@ Transform:
   - {fileID: 5371721160747685585}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!136 &1231185949527348461
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8968314704041842881}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 105.44533
+  m_Height: 1312.9359
+  m_Direction: 1
+  m_Center: {x: 1.5853882, y: 566.4092, z: -11.7014885}

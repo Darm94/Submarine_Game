@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8894195634041885567}
+  - component: {fileID: 8051012881670233068}
   m_Layer: 0
   m_Name: rpund pillar3 low
   m_TagString: Untagged
@@ -32,6 +33,29 @@ Transform:
   - {fileID: 3613352306935211927}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!136 &8051012881670233068
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1675424936821315702}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 99.00001
+  m_Height: 799.37836
+  m_Direction: 1
+  m_Center: {x: 4.0999985, y: 314.5894, z: 21.400003}
 --- !u!1 &6106940226716468289
 GameObject:
   m_ObjectHideFlags: 0

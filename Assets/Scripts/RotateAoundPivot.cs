@@ -7,7 +7,7 @@ public class RotateAoundPivot : MonoBehaviour
     [SerializeField] private bool randomAngle = false;
     [SerializeField] private Space rotationSpace = Space.Self;
 
-    private bool _animate;
+    [SerializeField] private bool _animate; //use it at true only if want to start with a visible object
 
     private void Start()
     {
@@ -22,6 +22,7 @@ public class RotateAoundPivot : MonoBehaviour
         if (_animate)
         {
             transform.Rotate(axis, Time.deltaTime * speed, rotationSpace);
+            //Debug.Log(transform.rotation.eulerAngles);
         }
     }
 
