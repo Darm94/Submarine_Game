@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using System.Collections;
 public class SubmarineManager : MonoBehaviour
 {
     [SerializeField] float fuel = 100f;
@@ -12,16 +12,25 @@ public class SubmarineManager : MonoBehaviour
     [SerializeField] Vector3 impulseForce = Vector3.up * 10;
     [SerializeField] Vector3 constantForce = Vector3.up * 20;
     [SerializeField] Vector3 forwardForce = Vector3.right * 20;
-
     [SerializeField] ForceMode forceMode = ForceMode.Force;
     
+    // Ghost effect
+    private float _ghostDuration = 12f; // Durata dell'effetto fantasma in secondi
+    private Color _ghostColor = new Color(0f, 0.5f, 1f, 0.2f); // Colore azzurro trasparente
+    private Color[] _originalColors;
+    private float[] _originalAlphas;
+    private SkinnedMeshRenderer rendererShip;
+    [SerializeField] private GameObject shipMesh;
+    
     //for now a solution to get the spawners and gameLimits reset
+    //get the object in case we need to move them
     [SerializeField] private GameObject boxesSpawner;
     [SerializeField] private GameObject minesSpawner;
     [SerializeField] private GameObject bottomColumnsSpawner;
     [SerializeField] private GameObject topColumnsSpawner;
-    [SerializeField] private float gameLimitX = 290;
-    [SerializeField] private float resetPositionOffset = 30;
+    [SerializeField] private GameObject powerUpSpawner;
+    [SerializeField] private float gameLimitX = 275;
+    [SerializeField] private float resetPositionOffset = 14.138f;
     private float _obstacleLimitX;
     private bool _isOnResetPhase = false;
     private Vector3 _startPosition;
@@ -29,6 +38,7 @@ public class SubmarineManager : MonoBehaviour
     private ObstacleLinearPlacer _minesSpawnerComponent ;
     private ObstacleLinearPlacer _bottomColumnsSpawnerComponent ;
     private ObstacleLinearPlacer _topColumnsSpawnerComponent ;
+    private PowerUpPlacer _powerUpSpawnerComponent ;
     
     bool _thrust;
     Rigidbody rb;
@@ -55,12 +65,32 @@ public class SubmarineManager : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         _startPosition = transform.position;
         
-    //Essential part for the spawner Coordination at X position gameLimit and for Gameover,we need to get this components    
-    _boxesSpawnerComponent = boxesSpawner.GetComponent<ObstacleLinearPlacer>();
-    _minesSpawnerComponent = minesSpawner.GetComponent<ObstacleLinearPlacer>();
-    _bottomColumnsSpawnerComponent = bottomColumnsSpawner.GetComponent<ObstacleLinearPlacer>();
-    _topColumnsSpawnerComponent = topColumnsSpawner.GetComponent<ObstacleLinearPlacer>();
-    _obstacleLimitX = gameLimitX - 40; // this magic number is calculated to not show objects disappearing
+        // Salva il colore e l'alpha originali del materiale.
+        rendererShip = shipMesh.GetComponent<SkinnedMeshRenderer>();
+        if (rendererShip != null)
+        {
+            int numMateriali = rendererShip.materials.Length;
+            _originalColors = new Color[numMateriali];
+            _originalAlphas = new float[numMateriali];
+
+            for (int i = 0; i < numMateriali; i++)
+            {
+                _originalColors[i] = rendererShip.materials[i].color;
+                _originalAlphas[i] = rendererShip.materials[i].color.a;
+            }
+        }
+        else
+        {
+            Debug.LogError("L'oggetto 'shipMesh' non ha uno Skinned Mesh Renderer!");
+        }
+        
+        //Essential part for the spawner Coordination at X position gameLimit and for Gameover,we need to get this components    
+        _boxesSpawnerComponent = boxesSpawner.GetComponent<ObstacleLinearPlacer>();
+        _minesSpawnerComponent = minesSpawner.GetComponent<ObstacleLinearPlacer>();
+        _bottomColumnsSpawnerComponent = bottomColumnsSpawner.GetComponent<ObstacleLinearPlacer>();
+        _topColumnsSpawnerComponent = topColumnsSpawner.GetComponent<ObstacleLinearPlacer>();
+        _powerUpSpawnerComponent = powerUpSpawner.GetComponent<PowerUpPlacer>();
+        _obstacleLimitX = gameLimitX - 45; // this magic number is calculated to not show objects disappearing
     }
 
     // Update is called once per frame
@@ -157,8 +187,54 @@ public class SubmarineManager : MonoBehaviour
                 enabled = false;
             }
         }
+        else if (other.gameObject.CompareTag("PowerUp"))
+        {
+            Destroy(other.gameObject);
+            StartCoroutine(CoroutineGhostEffect());
+        }
     }
 
+    IEnumerator CoroutineGhostEffect()
+    {
+        if (!rendererShip) yield break; // Esci se non c'è il renderer
+        Debug.Log("GHOST EFFECT ACTIVATED");
+        gameObject.layer = LayerMask.NameToLayer("Ghost");
+        shipMesh.layer = LayerMask.NameToLayer("Ghost");
+
+        int numMateriali = rendererShip.materials.Length;
+        Color[] coloriFantasmaConAlpha = new Color[numMateriali];
+
+        // Inizia con l'alpha a 0 per tutti i materiali.
+        for (int i = 0; i < numMateriali; i++)
+        {
+            coloriFantasmaConAlpha[i] = _ghostColor;
+            coloriFantasmaConAlpha[i].a = 0f; // Inizia con alpha 0
+        }
+
+        float timer = 0f;
+        while (timer < _ghostDuration)
+        {
+            timer += Time.deltaTime;
+            for (int i = 0; i < numMateriali; i++)
+            {
+                float alphaCorrente = Mathf.Lerp(0f, _originalAlphas[i], timer / _ghostDuration); // Inverti Lerp
+                Color coloreCorrente = _ghostColor;
+                coloreCorrente.a = alphaCorrente;
+                rendererShip.materials[i].color = coloreCorrente;
+            }
+            yield return null;
+        }
+
+        // Reset dei materiali ai valori originali.
+        for (int i = 0; i < numMateriali; i++)
+        {
+            rendererShip.materials[i].color = _originalColors[i];
+        }
+        Debug.Log("GHOST EFFECT EEEND");
+        gameObject.layer = LayerMask.NameToLayer("Player");
+        shipMesh.layer = LayerMask.NameToLayer("Player");
+    }
+    
     private void OnCollisionEnter(Collision other)
     {
         
@@ -179,6 +255,7 @@ public class SubmarineManager : MonoBehaviour
         _minesSpawnerComponent.enabled = false;
         _bottomColumnsSpawnerComponent.enabled = false;
         _topColumnsSpawnerComponent.enabled = false;
+        _powerUpSpawnerComponent.enabled = false;
         
         //Destroy boxes and Mine after the limit
         Collider[] collidersTrovati = Physics.OverlapSphere(transform.position, 50);
@@ -186,7 +263,7 @@ public class SubmarineManager : MonoBehaviour
         {
             if ((collider.CompareTag("Mine") || collider.CompareTag("Box")) && collider.transform.position.x > _obstacleLimitX + 20)
             {
-                //max for 2 element for one,i guess that's sustaneable
+                //max for 2 element for once,i guess that's sustaneable
                 collider.gameObject.GetComponent<DestroyOnBulletTrigger>().DestroyMyTarget();
             }
         }
@@ -199,6 +276,7 @@ public class SubmarineManager : MonoBehaviour
         _minesSpawnerComponent.enabled = true;
         _bottomColumnsSpawnerComponent.enabled = true;
         _topColumnsSpawnerComponent.enabled = true;
+        _powerUpSpawnerComponent.enabled = true;
     }
     
     
