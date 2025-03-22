@@ -14,11 +14,32 @@ public class ObstacleLinearPlacer : MonoBehaviour
         [SerializeField] [Range(0.5f, 30f)] private float destroyDelay = 10;
     
         Vector3 _startPosition;
+        private bool _started = false;
     
         void Start() {
             _startPosition = transform.position;
             _currentPosition = _startPosition;
             InvokeRepeating(nameof(PlaceObstacles), startDelay, repeatingRatio);
+            _started = true;
+        }
+
+        public void ManualPositionReset()
+        {
+            _currentPosition = _startPosition;
+        }
+
+        void OnDisable()
+        {
+            CancelInvoke(nameof(PlaceObstacles));
+        }
+
+        void OnEnable()
+        {
+            if (_started)
+            {
+                InvokeRepeating(nameof(PlaceObstacles), startDelay, repeatingRatio);
+            }
+            
         }
     
         void PlaceObstacles() {
@@ -33,15 +54,15 @@ public class ObstacleLinearPlacer : MonoBehaviour
            
             if (obstacle.name == "Mine" || obstacle.name == "Mine(Clone)")
             {
-                
+                /*
                 Debug.Log(obstacle.name);
                 Debug.Log(obstacle.transform.position.y);
                 Debug.Log(_startPosition.y + randomVerticalDisplacement);
-                Debug.Log("--------- ^^^^^^^ --------");
+                Debug.Log("--------- ^^^^^^^ --------"); */
                 if (obstacle.transform.position.y >= _startPosition.y + 1)
                 {
                     obstacle.transform.rotation *= Quaternion.Euler(180, 0, 0);
-                    Debug.Log("--------- ROTATED ^^^ --------");
+                    //Debug.Log("--------- ROTATED ^^^ --------");
                 }
                 
             }

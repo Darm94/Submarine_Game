@@ -21,6 +21,27 @@ public class DestroyOnBulletTrigger : MonoBehaviour
             }
         }
 
+        
+        Vector3 targetPosition = target.transform.position;
+        Collider[] hitColliders = Physics.OverlapSphere(targetPosition, 1f);
+
+        foreach (Collider hitCollider in hitColliders)
+        {
+            if (hitCollider.CompareTag("Bullet"))
+            {
+                Debug.Log("DESTROY BULLET: " + hitCollider.gameObject.name);
+                Destroy(hitCollider.gameObject);
+            }
+        }
+
+        // Distruggi il target.
+        DestroyMyTarget();
+
+    }
+
+    public void DestroyMyTarget()
+    {
+        Debug.Log("DESTROY TARGET: " + target.gameObject.name);
         Destroy(target);
     }
 }
