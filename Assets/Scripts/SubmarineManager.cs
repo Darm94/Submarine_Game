@@ -21,6 +21,7 @@ public class SubmarineManager : MonoBehaviour
     [SerializeField] private GameObject bottomColumnsSpawner;
     [SerializeField] private GameObject topColumnsSpawner;
     [SerializeField] private float gameLimitX = 290;
+    [SerializeField] private float resetPositionOffset = 30;
     private float _obstacleLimitX;
     private bool _isOnResetPhase = false;
     private Vector3 _startPosition;
@@ -59,7 +60,7 @@ public class SubmarineManager : MonoBehaviour
     _minesSpawnerComponent = minesSpawner.GetComponent<ObstacleLinearPlacer>();
     _bottomColumnsSpawnerComponent = bottomColumnsSpawner.GetComponent<ObstacleLinearPlacer>();
     _topColumnsSpawnerComponent = topColumnsSpawner.GetComponent<ObstacleLinearPlacer>();
-    _obstacleLimitX = gameLimitX - 40;
+    _obstacleLimitX = gameLimitX - 40; // this magic number is calculated to not show objects disappearing
     }
 
     // Update is called once per frame
@@ -81,7 +82,7 @@ public class SubmarineManager : MonoBehaviour
         //Teleport at start And Reset Player position
         if (transform.position.x >= gameLimitX)
         {
-            transform.position = new Vector3(_startPosition.x-20 , transform.position.y, transform.position.z);
+            transform.position = new Vector3(_startPosition.x-resetPositionOffset , transform.position.y, transform.position.z);//30 magic number could be resetPositionOffset
             _isOnResetPhase = true;
         }
         //Enable again and Reset all spawners
@@ -183,7 +184,7 @@ public class SubmarineManager : MonoBehaviour
         Collider[] collidersTrovati = Physics.OverlapSphere(transform.position, 50);
         foreach (Collider collider in collidersTrovati)
         {
-            if ((collider.CompareTag("Mine") || collider.CompareTag("Box")) && collider.transform.position.x > _obstacleLimitX + 10)
+            if ((collider.CompareTag("Mine") || collider.CompareTag("Box")) && collider.transform.position.x > _obstacleLimitX + 20)
             {
                 //max for 2 element for one,i guess that's sustaneable
                 collider.gameObject.GetComponent<DestroyOnBulletTrigger>().DestroyMyTarget();

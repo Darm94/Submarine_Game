@@ -1211,6 +1211,7 @@ MonoBehaviour:
   maxFuel: 100
   fuelUsageSpeed: 1
   mineFuelReduction: 5
+  boxFuelAddition: 6
   impulseForce: {x: 0, y: 10, z: 0}
   constantForce: {x: 0, y: 20, z: 0}
   forwardForce: {x: 40, y: 0, z: 0}
@@ -1219,7 +1220,8 @@ MonoBehaviour:
   minesSpawner: {fileID: 484474050}
   bottomColumnsSpawner: {fileID: 1086201383}
   topColumnsSpawner: {fileID: 1864435418}
-  gameLimitX: 290
+  gameLimitX: 275
+  resetPositionOffset: 14.14
   minRotation: 35
   maxRotation: -35
   pitchSpeed: 1
