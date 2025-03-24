@@ -261,6 +261,7 @@ public class SubmarineManager : MonoBehaviour
     private void GameOver()
     {
         DisableAllSpawners();
+        Camera.main.gameObject.GetComponent<GameOverScreen>().GameOverCamera();
     }
 
     private void DisableAllSpawners()

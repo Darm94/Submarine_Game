@@ -68,6 +68,7 @@ public class ObstacleLinearPlacer : MonoBehaviour
            ;
               */
            GameObject obstacle = GetAvailableObject(prefab);
+           availablePool.Remove(obstacle);//QUA LO IMPOSTO E' IMPOSSIBILE CHE LO VADA A SPOSTARE SE L'HO TOLTO DA QUA
            //obstacle.SetActive(true);
            Vector3 newPosition = _currentPosition + distance * movementDirection + displacement + 
                                  new Vector3(0, Random.Range(0, randomVerticalDisplacement), 0);
@@ -100,8 +101,8 @@ public class ObstacleLinearPlacer : MonoBehaviour
             Debug.Log("Cuttent " + obstacle.name +"swaner position is :" + _currentPosition);
             //Destroy(obstacle, destroyDelay);
             //StartCoroutine(DisableAfterTime(obstacle, destroyDelay));
-            //per sicurezza impostiamo il timer non da resettare anche da qui
-            obstacle.GetComponent<TimerResetter>().ToBeResetted = false;
+            
+            
             StartCoroutine(MoveAndAddToAvailableAfterTime(obstacle, destroyDelay));
         }
 
@@ -110,7 +111,8 @@ public class ObstacleLinearPlacer : MonoBehaviour
         {
             foreach (GameObject obj in availablePool)
             {
-                availablePool.Remove(obj);
+                obj.GetComponent<TimerResetter>().ToBeResetted = false; //Beggining from now the object timer can be restarted
+                //availablePool.Remove(obj);
                 return obj;
             }
             
@@ -131,8 +133,13 @@ public class ObstacleLinearPlacer : MonoBehaviour
             TimerResetter timerResetter = obstacle.GetComponent<TimerResetter>();
             if (timerResetter.ToBeResetted)
             {
-                timerResetter.ToBeResetted = false;
+                //timerResetter.ToBeResetted = false;
+                Debug.Log(obstacle.name + " Has been resetted CANT REMOVE IT");
                 yield break;
+            }
+            else
+            {
+                Debug.Log(obstacle.name + " Has NOT BEEN RESETTED time to REMOVE IT");
             }
               
             Debug.Log("DISABLE Time: " + obstacle.gameObject.name);
@@ -162,9 +169,20 @@ public class ObstacleLinearPlacer : MonoBehaviour
                 child.position = newPosition + child.localPosition;
             }
             oldObj.GetComponent<TimerResetter>().ToBeResetted = true;
-            availablePool.Add(oldObj);
+            //availablePool.Add(oldObj);
             
         }
+      
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
         private void MoveChildrenRecursively(Transform parent, Vector3 newPosition)
         {
@@ -203,6 +221,7 @@ public class ObstacleLinearPlacer : MonoBehaviour
             return newObj;
         }
 
+        
         private IEnumerator DisableAfterTime(GameObject obstacle, float delay)
         {
             yield return new WaitForSeconds(delay);

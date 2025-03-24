@@ -63,9 +63,9 @@ public class DestroyOnBulletTrigger : MonoBehaviour
         }
         //target.transform.position = Vector3.zero;
         //target.SetActive(false);
-        //respawnManager.SetAvailableObject(target);
+        respawnManager.SetAvailableObject(target);
         
         Debug.Log("ADDING TARGET ON AVAILABLES:  " + target.gameObject.name);
-        Destroy(target);
+        //Destroy(target);
     }
 }
