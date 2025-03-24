@@ -39,7 +39,7 @@ public class SubmarineManager : MonoBehaviour
     private ObstacleLinearPlacer _bottomColumnsSpawnerComponent ;
     private ObstacleLinearPlacer _topColumnsSpawnerComponent ;
     private PowerUpPlacer _powerUpSpawnerComponent ;
-    
+    private GameOverScreen _canvassScreen;
     bool _thrust;
     Rigidbody rb;
 
@@ -91,13 +91,15 @@ public class SubmarineManager : MonoBehaviour
         _topColumnsSpawnerComponent = topColumnsSpawner.GetComponent<ObstacleLinearPlacer>();
         _powerUpSpawnerComponent = powerUpSpawner.GetComponent<PowerUpPlacer>();
         _obstacleLimitX = gameLimitX - 45; // this magic number is calculated to not show objects disappearing
+
+        _canvassScreen = Camera.main.gameObject.GetComponent<GameOverScreen>();
     }
 
     // Update is called once per frame
     void Update()
     {
         fuel -= Time.deltaTime * fuelUsageSpeed;
-
+        _canvassScreen.UpdateFuelText((int)fuel);
         if (fuel <= 0)
         {
             enabled = false;
