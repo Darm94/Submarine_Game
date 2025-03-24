@@ -41,7 +41,10 @@ public class DestroyOnBulletTrigger : MonoBehaviour
 
     public void DestroyMyTarget()
     {
-        Debug.Log("DESTROY TARGET: " + target.gameObject.name);
+        //target.transform.position = Vector3.zero;
+        //target.SetActive(false);
+        
+        Debug.Log("DISABLE TARGET: " + target.gameObject.name);
         Destroy(target);
     }
 }

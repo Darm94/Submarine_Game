@@ -173,13 +173,15 @@ public class SubmarineManager : MonoBehaviour
 
         if (other.gameObject.CompareTag("Box"))
         {
-            Destroy(other.gameObject);
+            other.gameObject.SetActive(false);
+            other.gameObject.transform.position = Vector3.zero;
             fuel = Mathf.Clamp(fuel + boxFuelAddition, 0, maxFuel);
             Debug.Log($"Fuel gained: {fuel}");
         }
         else if (other.gameObject.CompareTag("Mine"))
         {
-            Destroy(other.gameObject);
+            other.gameObject.SetActive(false);
+            other.gameObject.transform.position = Vector3.zero;
             fuel = Mathf.Clamp(fuel - mineFuelReduction, 0, maxFuel);
             Debug.Log($"Fuel lost: {fuel}");
             if (fuel <= 0)

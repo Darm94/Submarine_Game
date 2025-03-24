@@ -1,4 +1,6 @@
+using System.Collections;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class ObstacleLinearPlacer : MonoBehaviour
 {
@@ -11,11 +13,12 @@ public class ObstacleLinearPlacer : MonoBehaviour
     
         [SerializeField] [Range(0.5f, 10f)] private float repeatingRatio = 1;
         [SerializeField] [Range(0.5f, 10f)] private float startDelay = 1;
-        [SerializeField] [Range(0.5f, 30f)] private float destroyDelay = 10;
+        [SerializeField] [Range(0.5f, 30f)] private float destroyDelay = 15;
     
         Vector3 _startPosition;
         private bool _started = false;
-    
+        private List<GameObject> obstaclePool = new List<GameObject>();
+        
         void Start() {
             _startPosition = transform.position;
             _currentPosition = _startPosition;
@@ -50,15 +53,24 @@ public class ObstacleLinearPlacer : MonoBehaviour
                 new Vector3(0, Random.Range(0, randomVerticalDisplacement), 0),
                 prefab.transform.rotation,
                 transform);
-
-           
-            if (obstacle.name == "Mine" || obstacle.name == "Mine(Clone)")
-            {
-                /*
-                Debug.Log(obstacle.name);
-                Debug.Log(obstacle.transform.position.y);
-                Debug.Log(_startPosition.y + randomVerticalDisplacement);
-                Debug.Log("--------- ^^^^^^^ --------"); */
+            
+            
+            /*
+           GameObject obstacle = GetPooledObject(prefab);
+           obstacle.SetActive(true);
+           obstacle.transform.position = _currentPosition + distance * movementDirection + displacement +
+                                         new Vector3(0, Random.Range(0, randomVerticalDisplacement), 0);
+           obstacle.transform.rotation = prefab.transform.rotation;
+           ;
+              */
+            
+           if (obstacle.name == "Mine" || obstacle.name == "Mine(Clone)")
+           {
+               /*
+               Debug.Log(obstacle.name);
+               Debug.Log(obstacle.transform.position.y);
+               Debug.Log(_startPosition.y + randomVerticalDisplacement);
+               Debug.Log("--------- ^^^^^^^ --------"); */
                 if (obstacle.transform.position.y >= _startPosition.y + 1)
                 {
                     obstacle.transform.rotation *= Quaternion.Euler(180, 0, 0);
@@ -66,9 +78,39 @@ public class ObstacleLinearPlacer : MonoBehaviour
                 }
                 
             }
+
             
-            _currentPosition = new Vector3(obstacle.transform.position.x, _startPosition.y, obstacle.transform.position.z);
-    
+            _currentPosition = new Vector3(obstacle.transform.position.x, _startPosition.y, _startPosition.z);
+            Debug.Log("Cuttent " + obstacle.name +"swaner position is :" + _currentPosition);
             Destroy(obstacle, destroyDelay);
+            //StartCoroutine(DisableAfterTime(obstacle, destroyDelay));
         }
+        
+        private GameObject GetPooledObject(GameObject prefab)
+        {
+            foreach (var obj in obstaclePool)
+            {
+                if (!obj.activeInHierarchy)
+                {
+                    
+                    return obj;
+                }
+            }
+
+            // Se non ci sono oggetti disponibili, ne creiamo uno nuovo e lo aggiungiamo al pool
+            GameObject newObj = Instantiate(prefab, Vector3.zero, Quaternion.identity, transform);
+            newObj.SetActive(false);
+            obstaclePool.Add(newObj);
+            return newObj;
+        }
+
+        private IEnumerator DisableAfterTime(GameObject obstacle, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            Debug.Log("DISABLE Time: " + obstacle.gameObject.name);
+            obstacle.SetActive(false);
+            obstacle.transform.position = Vector3.zero; // Spostiamo l'ostacolo in una posizione sicura
+        }
+        
+
 }
