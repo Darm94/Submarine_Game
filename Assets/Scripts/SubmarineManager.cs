@@ -65,7 +65,7 @@ public class SubmarineManager : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         _startPosition = transform.position;
         
-        // Salva il colore e l'alpha originali del materiale.
+        // Save color and original alpha of the material
         rendererShip = shipMesh.GetComponent<SkinnedMeshRenderer>();
         if (rendererShip != null)
         {
@@ -212,7 +212,7 @@ public class SubmarineManager : MonoBehaviour
 
     IEnumerator CoroutineGhostEffect()
     {
-        if (!rendererShip) yield break; // Esci se non c'è il renderer
+        if (!rendererShip) yield break; // Stop if render is null
         Debug.Log("GHOST EFFECT ACTIVATED");
         gameObject.layer = LayerMask.NameToLayer("Ghost");
         shipMesh.layer = LayerMask.NameToLayer("Ghost");
@@ -220,11 +220,11 @@ public class SubmarineManager : MonoBehaviour
         int numMateriali = rendererShip.materials.Length;
         Color[] coloriFantasmaConAlpha = new Color[numMateriali];
 
-        // Inizia con l'alpha a 0 per tutti i materiali.
+        // Start the alpha from 0 for all materials
         for (int i = 0; i < numMateriali; i++)
         {
             coloriFantasmaConAlpha[i] = _ghostColor;
-            coloriFantasmaConAlpha[i].a = 0f; // Inizia con alpha 0
+            coloriFantasmaConAlpha[i].a = 0f; // Start with alpha 0
         }
 
         float timer = 0f;
@@ -233,7 +233,7 @@ public class SubmarineManager : MonoBehaviour
             timer += Time.deltaTime;
             for (int i = 0; i < numMateriali; i++)
             {
-                float alphaCorrente = Mathf.Lerp(0f, _originalAlphas[i], timer / _ghostDuration); // Inverti Lerp
+                float alphaCorrente = Mathf.Lerp(0f, _originalAlphas[i], timer / _ghostDuration); // from 0 Lerp of ghost Effect
                 Color coloreCorrente = _ghostColor;
                 coloreCorrente.a = alphaCorrente;
                 rendererShip.materials[i].color = coloreCorrente;
@@ -241,7 +241,7 @@ public class SubmarineManager : MonoBehaviour
             yield return null;
         }
 
-        // Reset dei materiali ai valori originali.
+        // Reset original materials colors.
         for (int i = 0; i < numMateriali; i++)
         {
             rendererShip.materials[i].color = _originalColors[i];

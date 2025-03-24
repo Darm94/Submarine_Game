@@ -736,8 +736,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a5c5f4c2635c1243ac213c9ccea359c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  blackScreenImage: {fileID: 330585549}
+  blackScreenImage: {fileID: 653710266}
   gameOverObject: {fileID: 2057169447}
+  fuelObject: {fileID: 744108747}
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0

@@ -117,7 +117,7 @@ public class ObstacleLinearPlacer : MonoBehaviour
             }
             
             
-            // Se non ci sono oggetti disponibili, ne creiamo uno nuovo e lo aggiungiamo al pool
+            // If no objects available ,create a new one
             GameObject newObj = Instantiate(prefab, Vector3.zero, Quaternion.identity, transform);
             newObj.AddComponent<TimerResetter>();
             //obstaclePool.Add(newObj);
@@ -129,7 +129,7 @@ public class ObstacleLinearPlacer : MonoBehaviour
             
             
             yield return new WaitForSeconds(delay);
-            if (!obstacle) yield break;//se è già stato Distrutto o ricoloccato per qualche motivo salta (usato per le mine che ancora si distruggono e le scatole che si ricollocano)
+            if (!obstacle) yield break;//if destroy or reallocated for any reason (usato per le mine che ancora si distruggono e le scatole che si ricollocano)
             TimerResetter timerResetter = obstacle.GetComponent<TimerResetter>();
             if (timerResetter.ToBeResetted)
             {
@@ -162,7 +162,7 @@ public class ObstacleLinearPlacer : MonoBehaviour
 
         public void SetAvailableObject(GameObject oldObj)
         {
-            Vector3 newPosition = new Vector3(0,-50,0); // Spostiamo l'ostacolo in una posizione sicura
+            Vector3 newPosition = new Vector3(0,-50,0); // Move the  obstacle in a safe zone (To change with DISABLE)
             oldObj.transform.position = newPosition;
             foreach (Transform child in oldObj.transform)
             {
@@ -240,7 +240,7 @@ public class ObstacleLinearPlacer : MonoBehaviour
             }
             else
             {
-                Vector3 newPosition = new Vector3(0,-50,0); // Spostiamo l'ostacolo in una posizione sicura
+                Vector3 newPosition = new Vector3(0,-50,0); // move in a secure area
                 obstacle.transform.position = newPosition;
                 foreach (Transform child in obstacle.transform)
                 {
@@ -254,10 +254,10 @@ public class ObstacleLinearPlacer : MonoBehaviour
         
         private IEnumerator SetPositionAfterActivation(GameObject obstacle, Vector3 newPosition)
         {
-            // Aspetta 1 secondo per dare tempo a Unity di riattivare completamente l'oggetto
+            // Aspetta 1 frame
             yield return null; 
     
-            // Dopo 1 secondo, la posizione verrà aggiornata
+            
             obstacle.transform.position = newPosition;
         }
         
