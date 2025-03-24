@@ -6,7 +6,21 @@ public class DestroyOnBulletTrigger : MonoBehaviour
     [SerializeField] private GameObject spawnOnDestroy;
     [SerializeField] [Range(1,10)] private int maxInstances = 5;
     [SerializeField] private Vector3 randomDelta = Vector3.zero;
+    private ObstacleLinearPlacer respawnManager;
 
+    private void Start()
+    {
+        if (target != null && target.transform.parent != null)
+        {
+            GameObject father = target.transform.parent.gameObject;
+            Debug.Log("The OBJ father  " + target.name + " is: " + father.name);
+            respawnManager = father.GetComponent<ObstacleLinearPlacer>();
+        }
+        else
+        {
+            Debug.Log(target.name + " obj has no father.");
+        }
+    }
     private void OnTriggerEnter(Collider other)
     {
         if (spawnOnDestroy)
@@ -41,10 +55,17 @@ public class DestroyOnBulletTrigger : MonoBehaviour
 
     public void DestroyMyTarget()
     {
+        if (target.CompareTag("Mine"))
+        {
+            Debug.Log("MINE:  TARGET DESTROYED");
+            Destroy(target);
+            return;
+        }
         //target.transform.position = Vector3.zero;
         //target.SetActive(false);
+        //respawnManager.SetAvailableObject(target);
         
-        Debug.Log("DISABLE TARGET: " + target.gameObject.name);
+        Debug.Log("ADDING TARGET ON AVAILABLES:  " + target.gameObject.name);
         Destroy(target);
     }
 }

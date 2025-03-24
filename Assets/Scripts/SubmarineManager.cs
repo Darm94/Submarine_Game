@@ -173,8 +173,18 @@ public class SubmarineManager : MonoBehaviour
 
         if (other.gameObject.CompareTag("Box"))
         {
-            Destroy(other.gameObject);
+            //Destroy(other.gameObject);
             //other.gameObject.SetActive(false);
+            DestroyOnBulletTrigger destroyComponent = other.gameObject.GetComponent<DestroyOnBulletTrigger>();
+            if (destroyComponent)
+            {
+                Debug.Log("Removing obj BOX and setting on available Objects");
+                destroyComponent.DestroyMyTarget();
+            }
+            else
+            {
+                Destroy(other.gameObject);
+            }
             //other.gameObject.transform.position = Vector3.zero;
             fuel = Mathf.Clamp(fuel + boxFuelAddition, 0, maxFuel);
             Debug.Log($"Fuel gained: {fuel}");

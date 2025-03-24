@@ -100,9 +100,12 @@ public class ObstacleLinearPlacer : MonoBehaviour
             Debug.Log("Cuttent " + obstacle.name +"swaner position is :" + _currentPosition);
             //Destroy(obstacle, destroyDelay);
             //StartCoroutine(DisableAfterTime(obstacle, destroyDelay));
+            //per sicurezza impostiamo il timer non da resettare anche da qui
+            obstacle.GetComponent<TimerResetter>().ToBeResetted = false;
             StartCoroutine(MoveAndAddToAvailableAfterTime(obstacle, destroyDelay));
         }
 
+        
         private GameObject GetAvailableObject(GameObject prefab)
         {
             foreach (GameObject obj in availablePool)
@@ -114,7 +117,8 @@ public class ObstacleLinearPlacer : MonoBehaviour
             
             // Se non ci sono oggetti disponibili, ne creiamo uno nuovo e lo aggiungiamo al pool
             GameObject newObj = Instantiate(prefab, Vector3.zero, Quaternion.identity, transform);
-            obstaclePool.Add(newObj);
+            newObj.AddComponent<TimerResetter>();
+            //obstaclePool.Add(newObj);
             return newObj;
         }
         
@@ -123,29 +127,42 @@ public class ObstacleLinearPlacer : MonoBehaviour
             
             
             yield return new WaitForSeconds(delay);
-            if (!obstacle) yield break;//se è già stato Distrutto per qualche motivo salta (usato per le mine che ancora si distruggono)
-            
+            if (!obstacle) yield break;//se è già stato Distrutto o ricoloccato per qualche motivo salta (usato per le mine che ancora si distruggono e le scatole che si ricollocano)
+            TimerResetter timerResetter = obstacle.GetComponent<TimerResetter>();
+            if (timerResetter.ToBeResetted)
+            {
+                timerResetter.ToBeResetted = false;
+                yield break;
+            }
               
             Debug.Log("DISABLE Time: " + obstacle.gameObject.name);
             if (obstacle.name == "Mine" || obstacle.name == "Mine(Clone)")
             {
                 
-                Debug.Log("SPOSTO LA MINA ALLA POSIZIONE ZEROOOOOOO/partenza");
+                //Debug.Log("SPOSTO LA MINA ALLA POSIZIONE ZEROOOOOOO/partenza");
                 //obstacle.transform.localPosition = new Vector3(0, -50, 0);
                 //obstacle.transform.position = _startPosition;
                 //availablePool.Add(obstacle);
+                Debug.Log("DESTROY MINE FOR TIMEOUT");
                 Destroy(obstacle);
             }
             else
             {
-                Vector3 newPosition = new Vector3(0,-50,0); // Spostiamo l'ostacolo in una posizione sicura
-                obstacle.transform.position = newPosition;
-                foreach (Transform child in obstacle.transform)
-                {
-                    child.position = newPosition + child.localPosition;
-                }
-                availablePool.Add(obstacle);
+                SetAvailableObject(obstacle);
             }
+            
+        }
+
+        public void SetAvailableObject(GameObject oldObj)
+        {
+            Vector3 newPosition = new Vector3(0,-50,0); // Spostiamo l'ostacolo in una posizione sicura
+            oldObj.transform.position = newPosition;
+            foreach (Transform child in oldObj.transform)
+            {
+                child.position = newPosition + child.localPosition;
+            }
+            oldObj.GetComponent<TimerResetter>().ToBeResetted = true;
+            availablePool.Add(oldObj);
             
         }
         
@@ -178,10 +195,10 @@ public class ObstacleLinearPlacer : MonoBehaviour
             GameObject newObj = Instantiate(prefab, Vector3.zero, Quaternion.identity, transform);
             
             //exclude mines from pooling
-            if (!newObj.CompareTag("Mine"))
-            {
+            //if (!newObj.CompareTag("Mine"))
+            //{
                 obstaclePool.Add(newObj);
-            }
+            //}
             
             return newObj;
         }
