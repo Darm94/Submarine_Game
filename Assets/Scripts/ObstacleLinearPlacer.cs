@@ -94,7 +94,7 @@ public class ObstacleLinearPlacer : MonoBehaviour
                 }
                 
             }
-
+ 
             
             _currentPosition = new Vector3(obstacle.transform.position.x, _startPosition.y, _startPosition.z);
             Debug.Log("Cuttent " + obstacle.name +"swaner position is :" + _currentPosition);
@@ -164,28 +164,56 @@ public class ObstacleLinearPlacer : MonoBehaviour
         
         private GameObject GetPooledObject(GameObject prefab)
         {
+            
             foreach (var obj in obstaclePool)
             {
                 if (!obj.activeInHierarchy)
                 {
-                    
+                    obj.SetActive(true);
                     return obj;
                 }
             }
 
             // Se non ci sono oggetti disponibili, ne creiamo uno nuovo e lo aggiungiamo al pool
             GameObject newObj = Instantiate(prefab, Vector3.zero, Quaternion.identity, transform);
-            newObj.SetActive(false);
-            obstaclePool.Add(newObj);
+            
+            //exclude mines from pooling
+            if (!newObj.CompareTag("Mine"))
+            {
+                obstaclePool.Add(newObj);
+            }
+            
             return newObj;
         }
 
         private IEnumerator DisableAfterTime(GameObject obstacle, float delay)
         {
             yield return new WaitForSeconds(delay);
+            if (!obstacle) yield break;//se è già stato Distrutto per qualche motivo salta (usato per le mine che ancora si distruggono)
+            
+              
             Debug.Log("DISABLE Time: " + obstacle.gameObject.name);
-            obstacle.SetActive(false);
-            obstacle.transform.position = Vector3.zero; // Spostiamo l'ostacolo in una posizione sicura
+            if (obstacle.name == "Mine" || obstacle.name == "Mine(Clone)")
+            {
+                
+                Debug.Log("SPOSTO LA MINA ALLA POSIZIONE ZEROOOOOOO/partenza");
+                //obstacle.transform.localPosition = new Vector3(0, -50, 0);
+                //obstacle.transform.position = _startPosition;
+                //availablePool.Add(obstacle);
+                Destroy(obstacle);
+            }
+            else
+            {
+                Vector3 newPosition = new Vector3(0,-50,0); // Spostiamo l'ostacolo in una posizione sicura
+                obstacle.transform.position = newPosition;
+                foreach (Transform child in obstacle.transform)
+                {
+                    child.position = newPosition + child.localPosition;
+                }
+                availablePool.Add(obstacle);
+                obstacle.SetActive(false);
+            }
+            
         }
         
         private IEnumerator SetPositionAfterActivation(GameObject obstacle, Vector3 newPosition)
