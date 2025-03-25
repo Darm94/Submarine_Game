@@ -102,6 +102,7 @@ public class SubmarineManager : MonoBehaviour
         _canvassScreen.UpdateFuelText((int)fuel);
         if (fuel <= 0)
         {
+            _canvassScreen.UpdateFuelText(0);
             enabled = false;
         }
 
@@ -193,7 +194,17 @@ public class SubmarineManager : MonoBehaviour
         }
         else if (other.gameObject.CompareTag("Mine"))
         {
-            Destroy(other.gameObject);
+            DestroyOnBulletTrigger destroyComponent = other.gameObject.GetComponent<DestroyOnBulletTrigger>();
+            if (destroyComponent)
+            {
+                Debug.Log("Removing obj BOX and setting on available Objects");
+                destroyComponent.DestroyMyTarget();
+            }
+            else
+            {
+                Destroy(other.gameObject);
+            }
+            //Destroy(other.gameObject);
             //other.gameObject.SetActive(false);
             //other.gameObject.transform.position = Vector3.zero;
             fuel = Mathf.Clamp(fuel - mineFuelReduction, 0, maxFuel);

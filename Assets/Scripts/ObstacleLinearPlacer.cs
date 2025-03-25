@@ -113,6 +113,7 @@ public class ObstacleLinearPlacer : MonoBehaviour
             {
                 obj.GetComponent<TimerResetter>().ToBeResetted = false; //Beggining from now the object timer can be restarted
                 //availablePool.Remove(obj);
+                if (obj.CompareTag("Box")) Debug.Log("Recycling a BOX");
                 return obj;
             }
             
@@ -163,13 +164,27 @@ public class ObstacleLinearPlacer : MonoBehaviour
         public void SetAvailableObject(GameObject oldObj)
         {
             Vector3 newPosition = new Vector3(0,-50,0); // Move the  obstacle in a safe zone (To change with DISABLE)
-            oldObj.transform.position = newPosition;
+            
+            if (oldObj.CompareTag("Mine"))
+            {
+                 Debug.Log("MINE MINE MINE");
+                 oldObj.transform.position = newPosition;//NOT WORKING DO NOT USE THIS METHOD FOR MINES
+                 
+ 
+                 return;
+            }
+            else if (oldObj.CompareTag("Box"))
+            {
+                Debug.Log("BOX BOX BOX");
+            }
+            
+            oldObj.transform.SetPositionAndRotation(newPosition, oldObj.transform.rotation);
             foreach (Transform child in oldObj.transform)
             {
                 child.position = newPosition + child.localPosition;
             }
             oldObj.GetComponent<TimerResetter>().ToBeResetted = true;
-            //availablePool.Add(oldObj);
+            availablePool.Add(oldObj);
             
         }
       
@@ -180,6 +195,33 @@ public class ObstacleLinearPlacer : MonoBehaviour
         
         
         
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        //NOT USED ANYMORE
         
         
         

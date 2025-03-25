@@ -11,17 +11,34 @@ public class GameOverScreen : MonoBehaviour
     private float fadeDuration = 1f; 
     [SerializeField] GameObject gameOverObject;
     [SerializeField] GameObject fuelObject;
+    [SerializeField] GameObject pointsObject;
     private TextMeshProUGUI gameOverText;
+    private TextMeshProUGUI pointsText;
     private TextMeshProUGUI fuelText;
 
+    [SerializeField] private Slider fuelBar;
+    [SerializeField] private float maxFuel = 1000f; 
+    private float currentFuel;
+    
+    
     private void Start()
     {
         fuelText = fuelObject.GetComponent<TextMeshProUGUI>();
+        pointsText = pointsObject.GetComponent<TextMeshProUGUI>();
+        currentFuel = maxFuel; // Inizia con il serbatoio pieno
+        UpdateFuelBar();
     }
 
+    private void UpdateFuelBar()
+    {
+        fuelBar.value = currentFuel / maxFuel; // Normalizza il valore tra 0 e 1
+    }
+    
     public void UpdateFuelText(int fuel)
     {
         fuelText.text = fuel.ToString();
+        currentFuel = Mathf.Clamp(fuel, 0, maxFuel);
+        UpdateFuelBar();
     }
     public void GameOverCamera()
     {
@@ -38,6 +55,8 @@ public class GameOverScreen : MonoBehaviour
 
         
         gameOverObject.SetActive(true);
+        pointsObject.SetActive(true);
+        pointsText.text = "time: " + Time.time + " s";
         gameOverText.alpha = 0f; 
 
         while (elapsedTime < fadeDuration)
@@ -47,7 +66,9 @@ public class GameOverScreen : MonoBehaviour
             blackScreenImage.color = new Color(0f, 0f, 0f, alpha);
 
             
-            gameOverText.alpha = alpha;
+            Color newColor = gameOverText.color;
+            newColor.a = alpha;
+            gameOverText.color = newColor;
 
             yield return null;
         }

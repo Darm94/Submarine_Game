@@ -12,6 +12,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Box
       objectReference: {fileID: 0}
+    - target: {fileID: -6689036041284674117, guid: f68e99235207704439270ba4bc3632bc, type: 3}
+      propertyPath: m_TagString
+      value: Box
+      objectReference: {fileID: 0}
     - target: {fileID: -2460459685664139743, guid: f68e99235207704439270ba4bc3632bc, type: 3}
       propertyPath: m_TagString
       value: Box

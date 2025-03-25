@@ -8,6 +8,7 @@ public class DestroyOnBulletTrigger : MonoBehaviour
     [SerializeField] private Vector3 randomDelta = Vector3.zero;
     private ObstacleLinearPlacer respawnManager;
 
+    
     private void Start()
     {
         if (target != null && target.transform.parent != null)
@@ -37,7 +38,7 @@ public class DestroyOnBulletTrigger : MonoBehaviour
 
         
         Vector3 targetPosition = target.transform.position;
-        Collider[] hitColliders = Physics.OverlapSphere(targetPosition, 1f);
+        Collider[] hitColliders = Physics.OverlapSphere(targetPosition, 5f);
 
         foreach (Collider hitCollider in hitColliders)
         {
@@ -57,15 +58,28 @@ public class DestroyOnBulletTrigger : MonoBehaviour
     {
         if (target.CompareTag("Mine"))
         {
-            Debug.Log("MINE:  TARGET DESTROYED");
+            //Debug.Log("MINE:  TARGET DESTROYED");
             Destroy(target);
-            return;
+            Debug.Log("MINE:  TARGET REMOVED");
+            //respawnManager.SetAvailableObject(target);
         }
+        else if (target.CompareTag("Box"))
+        {
+            Destroy(target);
+            Debug.Log("BOX:  TARGET REMOVED");
+            //respawnManager.SetAvailableObject(target);
+        }
+        else
+        {
+            Debug.Log("OBjeCt DesTroyeD");
+            Destroy(target);
+        }
+        
         //target.transform.position = Vector3.zero;
         //target.SetActive(false);
-        respawnManager.SetAvailableObject(target);
         
-        Debug.Log("ADDING TARGET ON AVAILABLES:  " + target.gameObject.name);
+        
+        Debug.Log("Managing the object:  " + target.gameObject.name);
         //Destroy(target);
     }
 }
