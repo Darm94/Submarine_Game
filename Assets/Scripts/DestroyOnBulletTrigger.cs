@@ -61,6 +61,7 @@ public class DestroyOnBulletTrigger : MonoBehaviour
             //Debug.Log("MINE:  TARGET DESTROYED");
             Destroy(target);
             Debug.Log("MINE:  TARGET REMOVED");
+            //GetComponent<SphereCollider>().enabled = false;
             //respawnManager.SetAvailableObject(target);
         }
         else if (target.CompareTag("Box"))

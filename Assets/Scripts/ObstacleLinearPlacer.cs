@@ -171,7 +171,7 @@ public class ObstacleLinearPlacer : MonoBehaviour
                  oldObj.transform.position = newPosition;//NOT WORKING DO NOT USE THIS METHOD FOR MINES
                  
  
-                 return;
+                 //return;
             }
             else if (oldObj.CompareTag("Box"))
             {
