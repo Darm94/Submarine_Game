@@ -1090,7 +1090,7 @@ MonoBehaviour:
   movementDirection: {x: 1, y: 0, z: 0}
   repeatingRatio: 4
   startDelay: 2
-  destroyDelay: 40.6
+  destroyDelay: 22.6
 --- !u!1 &653710264
 GameObject:
   m_ObjectHideFlags: 0
@@ -6792,7 +6792,7 @@ MonoBehaviour:
   movementDirection: {x: 1, y: 0, z: 0}
   repeatingRatio: 4
   startDelay: 2
-  destroyDelay: 35.8
+  destroyDelay: 19.1
 --- !u!4 &1889100407 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400014, guid: d3620c6f4821f7a47ba050f5537eebe9, type: 3}
