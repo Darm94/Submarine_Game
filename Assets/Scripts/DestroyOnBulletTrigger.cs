@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class DestroyOnBulletTrigger : MonoBehaviour
 {
@@ -8,13 +10,20 @@ public class DestroyOnBulletTrigger : MonoBehaviour
     [SerializeField] private Vector3 randomDelta = Vector3.zero;
     private ObstacleLinearPlacer respawnManager;
 
-    
+    private void OnDisable()
+    {
+        if (GetComponent<Renderer>().isVisible)
+        {
+            Debug.Log(name + " è visibile dalla camera!");
+        };
+    }
+
     private void Start()
     {
         if (target != null && target.transform.parent != null)
         {
             GameObject father = target.transform.parent.gameObject;
-            Debug.Log("The OBJ father  " + target.name + " is: " + father.name);
+            //Debug.Log("The OBJ father  " + target.name + " is: " + father.name);
             respawnManager = father.GetComponent<ObstacleLinearPlacer>();
         }
         else
@@ -24,10 +33,15 @@ public class DestroyOnBulletTrigger : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
+        if (!other.CompareTag("Bullet")) return;
+        
+        //DESTROY ME
+        DestroyMyTarget();
+        
+        //CREATING BUBBLES
         if (spawnOnDestroy)
         {
             int realInstances = Random.Range(1, maxInstances);
-
             for (int i = 0; i < realInstances; i++)
             {
                 GameObject go = Instantiate(spawnOnDestroy, transform.position + 
@@ -35,11 +49,10 @@ public class DestroyOnBulletTrigger : MonoBehaviour
                 go.transform.localScale = Vector3.one * Random.Range(0.5f, 1.5f);
             }
         }
-
         
+        //DESTROY BULLETS
         Vector3 targetPosition = target.transform.position;
         Collider[] hitColliders = Physics.OverlapSphere(targetPosition, 5f);
-
         foreach (Collider hitCollider in hitColliders)
         {
             if (hitCollider.CompareTag("Bullet"))
@@ -48,10 +61,7 @@ public class DestroyOnBulletTrigger : MonoBehaviour
                 Destroy(hitCollider.gameObject);
             }
         }
-
-        // Distruggi il target.
-        DestroyMyTarget();
-
+        
     }
 
     public void DestroyMyTarget()
@@ -59,16 +69,16 @@ public class DestroyOnBulletTrigger : MonoBehaviour
         if (target.CompareTag("Mine"))
         {
             //Debug.Log("MINE:  TARGET DESTROYED");
-            Destroy(target);
+            //Destroy(target);
             Debug.Log("MINE:  TARGET REMOVED");
             //GetComponent<SphereCollider>().enabled = false;
-            //respawnManager.SetAvailableObject(target);
+            respawnManager.SetAvailableObject(target);
         }
         else if (target.CompareTag("Box"))
         {
-            Destroy(target);
-            Debug.Log("BOX:  TARGET REMOVED");
-            //respawnManager.SetAvailableObject(target);
+            
+            //Debug.Log("BOX:  TARGET REMOVED");
+            respawnManager.SetAvailableObject(target);
         }
         else
         {
@@ -80,7 +90,7 @@ public class DestroyOnBulletTrigger : MonoBehaviour
         //target.SetActive(false);
         
         
-        Debug.Log("Managing the object:  " + target.gameObject.name);
+        //Debug.Log("Managing the object:  " + target.gameObject.name);
         //Destroy(target);
     }
 }

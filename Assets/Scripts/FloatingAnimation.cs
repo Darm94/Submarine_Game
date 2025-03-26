@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class FloatingAnimation : MonoBehaviour
@@ -7,6 +8,11 @@ public class FloatingAnimation : MonoBehaviour
     [SerializeField] private float delta = 1;
     private Vector3 _startPosition;
     private void Start()
+    {
+        _startPosition = transform.position;
+    }
+
+    private void OnEnable()
     {
         _startPosition = transform.position;
     }

@@ -13,11 +13,11 @@ public class ObstacleLinearPlacer : MonoBehaviour
     
         [SerializeField] [Range(0.5f, 10f)] private float repeatingRatio = 1;
         [SerializeField] [Range(0.5f, 10f)] private float startDelay = 1;
-        [SerializeField] [Range(0.5f, 30f)] private float destroyDelay = 15;
-    
+        [SerializeField] [Range(0.5f, 60f)] private float destroyDelay = 30;
+        private Dictionary<GameObject, Coroutine> activeCoroutines = new Dictionary<GameObject, Coroutine>();
+        
         Vector3 _startPosition;
-        private bool _started = false;
-        private List<GameObject> obstaclePool = new List<GameObject>();
+        private bool _started;
         private List<GameObject> availablePool = new List<GameObject>();
         
         void Start() {
@@ -42,265 +42,144 @@ public class ObstacleLinearPlacer : MonoBehaviour
             if (_started)
             {
                 InvokeRepeating(nameof(PlaceObstacles), startDelay, repeatingRatio);
+                ResetPool();
+                StopAllCoroutines();
             }
-            
         }
     
-        void PlaceObstacles() {
-            GameObject prefab = obstaclePrefabs[Random.Range(0, obstaclePrefabs.Length)];
-    
-            /*GameObject obstacle = Instantiate(prefab,
-                _currentPosition + distance * movementDirection + displacement +
-                new Vector3(0, Random.Range(0, randomVerticalDisplacement), 0),
-                prefab.transform.rotation,
-                transform);
-    */
-
-           /* 
-           GameObject obstacle = GetPooledObject(prefab);
-           obstacle.SetActive(true);
-           Vector3 newPosition = _currentPosition + distance * movementDirection + displacement + 
-                                 new Vector3(0, Random.Range(0, randomVerticalDisplacement), 0);
-    
-           // Avvia Coroutine per aspettare 1 secondo e poi aggiornare la posizione
-           obstacle.transform.position = newPosition;
-           obstacle.transform.rotation = prefab.transform.rotation;
-           ;
-              */
+        void PlaceObstacles() { 
+            
+           GameObject prefab = obstaclePrefabs[Random.Range(0, obstaclePrefabs.Length)]; 
+           //GET FROM POOL if exist
            GameObject obstacle = GetAvailableObject(prefab);
-           availablePool.Remove(obstacle);//QUA LO IMPOSTO E' IMPOSSIBILE CHE LO VADA A SPOSTARE SE L'HO TOLTO DA QUA
-           //obstacle.SetActive(true);
+           //availablePool.Remove(obstacle);//QUA LO IMPOSTO E' IMPOSSIBILE CHE LO VADA A SPOSTARE SE L'HO TOLTO DA QUA
+           
+           
+           //POSITION AND ROTATIONS
            Vector3 newPosition = _currentPosition + distance * movementDirection + displacement + 
                                  new Vector3(0, Random.Range(0, randomVerticalDisplacement), 0);
-    
-           
            obstacle.transform.position = newPosition;
+           
+           //forboxes
            foreach (Transform child in obstacle.transform)
            {
                child.position = newPosition + child.localPosition;
            }
            obstacle.transform.rotation = prefab.transform.rotation;
-            
+           
            if (obstacle.name == "Mine" || obstacle.name == "Mine(Clone)")
            {
-               /*
-               Debug.Log(obstacle.name);
-               Debug.Log(obstacle.transform.position.y);
-               Debug.Log(_startPosition.y + randomVerticalDisplacement);
-               Debug.Log("--------- ^^^^^^^ --------"); */
+               //Rotating basing on Y
                 if (obstacle.transform.position.y >= _startPosition.y + 1)
                 {
                     obstacle.transform.rotation *= Quaternion.Euler(180, 0, 0);
-                    //Debug.Log("--------- ROTATED ^^^ --------");
                 }
-                
             }
+           
+            //RESET OBSTACLE
+           obstacle.SetActive(true); //riattiva componenti di spostamento e rotazione
+           obstacle.GetComponent<TimerResetter>().ToBeResetted = false; // Ora può essere riutilizzato
  
             
             _currentPosition = new Vector3(obstacle.transform.position.x, _startPosition.y, _startPosition.z);
-            Debug.Log("Cuttent " + obstacle.name +"swaner position is :" + _currentPosition);
-            //Destroy(obstacle, destroyDelay);
-            //StartCoroutine(DisableAfterTime(obstacle, destroyDelay));
+            //Debug.Log("Cuttent " + obstacle.name +"swaner position is :" + _currentPosition);
             
             
-            StartCoroutine(MoveAndAddToAvailableAfterTime(obstacle, destroyDelay));
+            if(obstacle.name == "Box(Clone)")
+                Debug.Log("START TIMEOUT COROUTINE , TobeResetted is= "+ obstacle.GetComponent<TimerResetter>().ToBeResetted);
+            //StartCoroutine(MoveAndAddToAvailableAfterTime(obstacle, destroyDelay));
+            if (activeCoroutines.ContainsKey(obstacle))
+            {
+                StopCoroutine(activeCoroutines[obstacle]); // Ferma la vecchia coroutine
+                activeCoroutines.Remove(obstacle);
+            }
+
+            Coroutine newCoroutine = StartCoroutine(MoveAndAddToAvailableAfterTime(obstacle, destroyDelay));
+            activeCoroutines[obstacle] = newCoroutine;
         }
 
         
         private GameObject GetAvailableObject(GameObject prefab)
         {
-            foreach (GameObject obj in availablePool)
+            string prefabTag = prefab.tag; // Ottieni il tag del prefab che vuoi
+            for (int i = 0; i < availablePool.Count; i++)
             {
-                obj.GetComponent<TimerResetter>().ToBeResetted = false; //Beggining from now the object timer can be restarted
-                //availablePool.Remove(obj);
-                if (obj.CompareTag("Box")) Debug.Log("Recycling a BOX");
-                return obj;
+                GameObject obj = availablePool[i];
+            
+                // Se l'oggetto ha il tag corretto, usalo
+                if (obj.CompareTag(prefabTag) && !obj.activeInHierarchy )
+                {
+                    availablePool.RemoveAt(i); // Rimuovilo prima di restituirlo
+                    obj.GetComponent<TimerResetter>().ToBeResetted = false;
+                    Debug.Log($"Recycling a {prefabTag}");
+                    return obj;
+                }
             }
             
             
-            // If no objects available ,create a new one
+            // Se nessun oggetto disponibile, creane uno nuovo
             GameObject newObj = Instantiate(prefab, Vector3.zero, Quaternion.identity, transform);
             newObj.AddComponent<TimerResetter>();
-            //obstaclePool.Add(newObj);
             return newObj;
         }
         
         private IEnumerator MoveAndAddToAvailableAfterTime(GameObject obstacle, float delay)
         {
-            
-            
             yield return new WaitForSeconds(delay);
             if (!obstacle) yield break;//if destroy or reallocated for any reason (usato per le mine che ancora si distruggono e le scatole che si ricollocano)
             TimerResetter timerResetter = obstacle.GetComponent<TimerResetter>();
             if (timerResetter.ToBeResetted)
             {
-                //timerResetter.ToBeResetted = false;
-                Debug.Log(obstacle.name + " Has been resetted CANT REMOVE IT");
+                if(obstacle.name == "Box(Clone)")
+                    Debug.Log(obstacle.name + " Has been resetted CANT REMOVE IT");
                 yield break;
             }
             else
             {
-                Debug.Log(obstacle.name + " Has NOT BEEN RESETTED time to REMOVE IT");
+                if(obstacle.name == "Box(Clone)")
+                    Debug.Log(obstacle.name + " Has NOT BEEN RESETTED time to REMOVE IT");
             }
               
-            Debug.Log("DISABLE Time: " + obstacle.gameObject.name);
-            if (obstacle.name == "Mine" || obstacle.name == "Mine(Clone)")
-            {
-                
-                //Debug.Log("SPOSTO LA MINA ALLA POSIZIONE ZEROOOOOOO/partenza");
-                //obstacle.transform.localPosition = new Vector3(0, -50, 0);
-                //obstacle.transform.position = _startPosition;
-                //availablePool.Add(obstacle);
-                Debug.Log("DESTROY MINE FOR TIMEOUT");
-                Destroy(obstacle);
-            }
-            else
-            {
-                SetAvailableObject(obstacle);
-            }
             
+            if (obstacle.name == "Box" || obstacle.name == "Box(Clone)")
+                Debug.Log("------DISABLING obj : " + obstacle.gameObject.name);
+            
+            
+            SetAvailableObject(obstacle);
         }
 
         public void SetAvailableObject(GameObject oldObj)
         {
-            Vector3 newPosition = new Vector3(0,-50,0); // Move the  obstacle in a safe zone (To change with DISABLE)
             
-            if (oldObj.CompareTag("Mine"))
+            if (activeCoroutines.ContainsKey(oldObj))
             {
-                 Debug.Log("MINE MINE MINE");
-                 oldObj.transform.position = newPosition;//NOT WORKING DO NOT USE THIS METHOD FOR MINES
-                 
- 
-                 //return;
-            }
-            else if (oldObj.CompareTag("Box"))
-            {
-                Debug.Log("BOX BOX BOX");
+                StopCoroutine(activeCoroutines[oldObj]); // Interrompe la coroutine in atto
+                activeCoroutines.Remove(oldObj);
             }
             
-            oldObj.transform.SetPositionAndRotation(newPosition, oldObj.transform.rotation);
-            foreach (Transform child in oldObj.transform)
-            {
-                child.position = newPosition + child.localPosition;
-            }
+            oldObj.SetActive(false);
             oldObj.GetComponent<TimerResetter>().ToBeResetted = true;
+            
+            
+            
+            if(oldObj.name == "Box(Clone)")
+                Debug.Log("To Be Resetted? :" + oldObj.GetComponent<TimerResetter>().ToBeResetted);
+            
             availablePool.Add(oldObj);
             
         }
-      
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        //NOT USED ANYMORE
-        
-        
-        
-        
-        private void MoveChildrenRecursively(Transform parent, Vector3 newPosition)
-        {
-            foreach (Transform child in parent)
-            {
-                // Calculate the new position of the child.
-                child.position = newPosition + child.localPosition;
 
-                // Recursively move the children of the child.
-                MoveChildrenRecursively(child, newPosition);
-            }
-        }
-        
-        
-        private GameObject GetPooledObject(GameObject prefab)
+        public void ResetPool()
         {
             
-            foreach (var obj in obstaclePool)
-            {
-                if (!obj.activeInHierarchy)
-                {
-                    obj.SetActive(true);
-                    return obj;
-                }
-            }
-
-            // Se non ci sono oggetti disponibili, ne creiamo uno nuovo e lo aggiungiamo al pool
-            GameObject newObj = Instantiate(prefab, Vector3.zero, Quaternion.identity, transform);
-            
-            //exclude mines from pooling
-            //if (!newObj.CompareTag("Mine"))
+            //Eventualy implement e queue for elements not available and reset this objects
+            //for now i calculated a specific time to be sure that all object goes in timeout disablig coroutine
+            //foreach (GameObject obj in availablePool)
             //{
-                obstaclePool.Add(newObj);
+                //obj.SetActive(false);
+                //Destroy(obj);
             //}
-            
-            return newObj;
-        }
-
-        
-        private IEnumerator DisableAfterTime(GameObject obstacle, float delay)
-        {
-            yield return new WaitForSeconds(delay);
-            if (!obstacle) yield break;//se è già stato Distrutto per qualche motivo salta (usato per le mine che ancora si distruggono)
-            
-              
-            Debug.Log("DISABLE Time: " + obstacle.gameObject.name);
-            if (obstacle.name == "Mine" || obstacle.name == "Mine(Clone)")
-            {
-                
-                Debug.Log("SPOSTO LA MINA ALLA POSIZIONE ZEROOOOOOO/partenza");
-                //obstacle.transform.localPosition = new Vector3(0, -50, 0);
-                //obstacle.transform.position = _startPosition;
-                //availablePool.Add(obstacle);
-                Destroy(obstacle);
-            }
-            else
-            {
-                Vector3 newPosition = new Vector3(0,-50,0); // move in a secure area
-                obstacle.transform.position = newPosition;
-                foreach (Transform child in obstacle.transform)
-                {
-                    child.position = newPosition + child.localPosition;
-                }
-                availablePool.Add(obstacle);
-                obstacle.SetActive(false);
-            }
-            
-        }
-        
-        private IEnumerator SetPositionAfterActivation(GameObject obstacle, Vector3 newPosition)
-        {
-            // Aspetta 1 frame
-            yield return null; 
-    
-            
-            obstacle.transform.position = newPosition;
+            //availablePool.Clear();
         }
         
 }

@@ -181,7 +181,7 @@ public class SubmarineManager : MonoBehaviour
             DestroyOnBulletTrigger destroyComponent = other.gameObject.GetComponent<DestroyOnBulletTrigger>();
             if (destroyComponent)
             {
-                Debug.Log("Removing obj BOX and setting on available Objects");
+                Debug.Log("SUBMARINE: Removing obj BOX and setting on available Objects");
                 destroyComponent.DestroyMyTarget();
             }
             else
